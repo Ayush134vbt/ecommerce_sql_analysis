@@ -2,7 +2,7 @@ select * from orders
 limit 10;
 
 
--- Busines Question 1: What portion of orders were succesfully delivered? 
+-- Q1: What portion of orders were succesfully delivered? 
 
 --- Ordering based on total orders in descending order
 select
@@ -15,7 +15,7 @@ order by total_orders desc;
 
 ---97.02% of recorded orders have a delivered status. Although this represents a high proportion, delivery timeliness must also be considered when evaluating operational performance.
 
---- Business Question 2: Are there missing values in the orders table?
+--- Q2: Are there missing values in the orders table?
 
 select
     count(*)                                         as total_rows,
@@ -56,3 +56,20 @@ SELECT
 FROM orders
 GROUP BY order_id
 HAVING COUNT(*) > 1;
+-- No duplicate order IDs were found.
+-- The order_id column is a primary key, so PostgreSQL
+-- enforces uniqueness and prevents NULL values.
+
+
+
+-- Q3:
+-- Are there any orders with invalid delivery timestamps?
+
+SELECT
+    order_id,
+    order_purchase_timestamp,
+    order_delivered_customer_date
+FROM orders
+WHERE order_delivered_customer_date
+      < order_purchase_timestamp;
+--- There are not any orders with inconsistent time stamps. 
