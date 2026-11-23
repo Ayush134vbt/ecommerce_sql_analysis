@@ -1,14 +1,14 @@
-# E-Commerce Sales & Customer Analytics Using SQL
+# E-Commerce Sales & Customer Analytics Using SQL and Power BI
 
 ## Project Overview
 
-This project uses PostgreSQL to analyse the Brazilian E-Commerce Public Dataset by Olist, an anonymised dataset containing approximately 100,000 orders from Brazilian online retailers.
+This project uses PostgreSQL to analyse the Brazilian E-Commerce Public Dataset by Olist, an anonymised dataset containing approximately 100,000 orders from Brazilian online retailers. The results are summarised in a three-page Power BI dashboard.
 
 The project aims to investigate business performance through SQL-based data exploration, validation and KPI analysis.
 
 The analysis focuses on understanding sales performance, customer purchasing behaviour, product performance and delivery efficiency.
 
-**Project status:** In progress — data exploration and initial delivery analysis completed.
+**Project status:** SQL analysis scripts for all four areas and a first Power BI dashboard are complete. Further investigation of late deliveries is planned.
 
 ## Business Objectives
 
@@ -23,6 +23,7 @@ The project investigates four key areas:
 
 - **PostgreSQL:** Database management and SQL analysis
 - **Visual Studio Code:** Writing and executing SQL queries
+- **Power BI (Service):** Dashboard built in the browser
 - **Git and GitHub:** Version control and project documentation
 - **SQL:** Joins, aggregations, window functions, date operations and data validation
 
@@ -58,10 +59,33 @@ ecommerce_sql_analysis/
 │   ├── 05_product_analysis.sql
 │   └── 06_delivery_analysis.sql
 ├── figures/
+│   ├── sales_overview.png
+│   ├── delivery_performance.png
+│   └── customers_products.png
 ├── insights/
 ├── .gitignore
 └── README.md
 ```
+
+## Power BI Dashboard
+
+A three-page dashboard summarising the analysis. Revenue figures count delivered orders only and use item prices, excluding freight. The monthly trend chart is limited to January 2017 – August 2018, because 2016 and the final months of the dataset contain very few orders.
+
+### 1. Sales overview
+
+![Sales overview](figures/sales_overview.png)
+
+### 2. Delivery performance
+
+![Delivery performance](figures/delivery_performance.png)
+
+The state chart is limited to states with at least 100 orders, so that small samples do not dominate the ranking.
+
+### 3. Customers and products
+
+![Customers and products](figures/customers_products.png)
+
+**Note on how the dashboard was built:** the dashboard reads from a summary workbook (one row per order, plus category and customer-order tables) that applies the same logic as the SQL queries in this repository. It is not a live connection to the PostgreSQL database. The headline figures match the SQL results.
 
 ## Analysis and Key Findings
 
@@ -75,7 +99,7 @@ SQL techniques:
 - `ORDER BY`
 - Window functions using `OVER()`
 
-**Finding:** 97.02% of recorded orders have a delivered status.
+**Finding:** 97.02% of recorded orders have a delivered status (96,478 orders).
 
 This indicates that most orders in the dataset were recorded as delivered. However, the proportion of delivered orders alone does not establish whether deliveries were timely.
 
@@ -104,7 +128,44 @@ Missing delivery timestamps can be expected for orders that have not yet been de
 
 The 8 delivered orders without a customer delivery date were excluded from delivery duration calculations.
 
-### 3. Delivery Performance
+### 3. Sales Performance
+
+**Business Question:** How much revenue does the business generate, and how does it change over time?
+
+| KPI | Result |
+|---|---:|
+| Delivered orders | 96,478 |
+| Product revenue (delivered orders, excluding freight) | 13,221,498.11 |
+| Average order value | 137.04 |
+
+**Key insights:**
+
+Monthly revenue grew through 2017, peaking in November 2017 at about 988K, and then levelled off at roughly 0.85M to 1M a month in 2018 (for example, 978K in May 2018).
+
+The dataset does not explain the November 2017 peak, so no cause is claimed here.
+
+### 4. Customer Analytics
+
+**Business Question:** What are the purchasing patterns of customers, and how frequently do they return?
+
+| KPI | Result |
+|---|---:|
+| Unique customers | 96,096 |
+| Customers with one order | 93,099 |
+| Customers with two orders | 2,745 |
+| Customers with three orders | 203 |
+| Customers with four or more orders | 49 |
+| Repeat customer rate | 3.12% |
+
+**Key insight:** Roughly 97% of customers placed only one order. Growth in this dataset therefore comes mainly from new customers, not from repeat purchases.
+
+### 5. Product Analytics
+
+**Business Question:** Which products and categories contribute the most to sales?
+
+The three highest-revenue categories among delivered items are `health_beauty` (about 1.23M), `watches_gifts` (about 1.17M) and `bed_bath_table` (about 1.02M). The top ten categories are shown in the dashboard.
+
+### 6. Delivery Performance
 
 **Business Question:** How long do deliveries take, and how often are orders late?
 
@@ -129,31 +190,15 @@ Late deliveries were delayed by an average of 9.6 days, suggesting that delays m
 
 The maximum delay of 189 days represents an extreme observation that warrants further investigation.
 
-**Potential business implication:** Delivery reliability could be improved by investigating the products, sellers or geographic areas associated with late deliveries. Further analysis is needed before identifying the underlying causes.
+**Late rate by state (states with at least 100 orders):** late deliveries are concentrated in a few northern and north-eastern states. Alagoas (AL) has the highest late rate at 23.9%, followed by Maranhão (MA) at 19.7% and Piauí (PI) at 16.0%. By comparison, São Paulo (SP) has a late rate of 5.9% and Minas Gerais (MG) 5.6%.
 
-## Upcoming Analysis
+**Potential business implication:** Delivery reliability could be improved by investigating the products, sellers or geographic areas associated with late deliveries. The state-level pattern shows where delays occur but does not explain why, so further analysis is needed before identifying the underlying causes.
 
-### Sales Analytics
-- Total product revenue
-- Average order value
-- Monthly revenue trends
-- Revenue growth
+## Possible Extensions
 
-### Customer Analytics
-- Unique customers
-- Repeat purchase behaviour
-- Purchase frequency
-- Revenue per customer
-
-### Product Analytics
-- Top-performing product categories
-- Product revenue contribution
-- Units sold
-
-### Delivery Analytics
-- Distribution of delivery delays
-- Delivery performance by geographic area
-- Identification of extreme delivery delays
+- Connect Power BI directly to the PostgreSQL database so the dashboard is built from the SQL queries themselves.
+- Investigate the extreme delivery delays and whether they relate to specific sellers or product categories.
+- Analyse revenue per customer and purchase frequency in more detail.
 
 ## Reproducing the Analysis
 
@@ -171,8 +216,9 @@ The maximum delay of 189 days represents an extreme observation that warrants fu
 - Order status reflects the recorded state of each transaction, not necessarily its final outcome.
 - Some delivery timestamps are missing or inconsistent.
 - The current analysis uses only five of the available Olist tables.
+- The dashboard is built from a summary workbook that replicates the SQL logic, not from a live database connection.
 - Observed associations do not necessarily establish causal relationships.
 
 ## Project Purpose
 
-This project forms part of my Data Analyst portfolio and demonstrates the application of SQL to real-world business questions, including relational data management, data quality assessment, KPI calculation and evidence-based business reporting.
+This project forms part of my Data Analyst portfolio and demonstrates the application of SQL to real-world business questions, including relational data management, data quality assessment, KPI calculation, evidence-based business reporting and dashboard design.
